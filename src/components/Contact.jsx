@@ -23,14 +23,17 @@ const Contact = () => {
         {
           from_name: form.name,
           from_email: form.email,
+          reply_to: form.email,
           subject: form.subject,
           message: form.message,
+          to_email: 'Shantanu.pandey47@gmail.com',
         },
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY
       )
       setStatus('success')
       setForm(INITIAL_FORM)
-    } catch {
+    } catch (err) {
+      console.error('EmailJS error:', err)
       setStatus('error')
     }
   }
