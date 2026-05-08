@@ -8,6 +8,7 @@ const INITIAL_FORM = { name: '', email: '', subject: '', message: '' }
 const Contact = () => {
   const [form, setForm] = useState(INITIAL_FORM)
   const [status, setStatus] = useState('idle') // idle | loading | success | error
+  const [errorMsg, setErrorMsg] = useState('')
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -16,6 +17,7 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setStatus('loading')
+    setErrorMsg('')
     try {
       await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
@@ -33,6 +35,8 @@ const Contact = () => {
       setForm(INITIAL_FORM)
     } catch (err) {
       console.error('EmailJS error:', err)
+      const detail = err?.text || err?.message || JSON.stringify(err)
+      setErrorMsg(detail)
       setStatus('error')
     }
   }
@@ -108,6 +112,7 @@ const Contact = () => {
               {status === 'error' && (
                 <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
                   Something went wrong. Please try again or email me directly.
+                  {errorMsg && <div className="mt-1 font-mono text-xs break-all opacity-75">{errorMsg}</div>}
                 </div>
               )}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
