@@ -27,7 +27,7 @@ const Contact = () => {
           subject: form.subject,
           message: form.message,
         },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY }
       )
       setStatus('success')
       setForm(INITIAL_FORM)
