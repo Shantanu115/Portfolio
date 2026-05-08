@@ -1,24 +1,38 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
+import emailjs from '@emailjs/browser'
 
-const RECIPIENT_EMAIL = 'Shantanu.pandey47@gmail.com'
+const INITIAL_FORM = { name: '', email: '', subject: '', message: '' }
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const [form, setForm] = useState(INITIAL_FORM)
+  const [status, setStatus] = useState('idle') // idle | loading | success | error
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const body = `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
-    const mailto = `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`
-    window.location.href = mailto
-    setSent(true)
-    setForm({ name: '', email: '', subject: '', message: '' })
+    setStatus('loading')
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          subject: form.subject,
+          message: form.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
+      setStatus('success')
+      setForm(INITIAL_FORM)
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -84,9 +98,14 @@ const Contact = () => {
             viewport={{ once: true }}
           >
             <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-md h-full">
-              {sent && (
+              {status === 'success' && (
                 <div className="mb-6 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
-                  Your email client has opened with the message pre-filled. Please send it to complete your inquiry.
+                  Message sent successfully! I'll get back to you soon.
+                </div>
+              )}
+              {status === 'error' && (
+                <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                  Something went wrong. Please try again or email me directly.
                 </div>
               )}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -129,9 +148,10 @@ const Contact = () => {
               ></textarea>
               <button
                 type="submit"
-                className="w-full md:w-auto px-10 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/85 transition-all hover:-translate-y-0.5"
+                disabled={status === 'loading'}
+                className="w-full md:w-auto px-10 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/85 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
-                Send Message
+                {status === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </motion.div>
