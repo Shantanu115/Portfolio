@@ -1,11 +1,24 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
 
+const RECIPIENT_EMAIL = 'Shantanu.pandey47@gmail.com'
+
 const Contact = () => {
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  const [sent, setSent] = useState(false)
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle form submission
-    alert('Form submitted! (Connect to your backend)')
+    const body = `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`
+    const mailto = `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(form.subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailto
+    setSent(true)
+    setForm({ name: '', email: '', subject: '', message: '' })
   }
 
   return (
@@ -71,15 +84,26 @@ const Contact = () => {
             viewport={{ once: true }}
           >
             <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-md h-full">
+              {sent && (
+                <div className="mb-6 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+                  Your email client has opened with the message pre-filled. Please send it to complete your inquiry.
+                </div>
+              )}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Your Name"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Your Email"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
@@ -87,11 +111,17 @@ const Contact = () => {
               </div>
               <input
                 type="text"
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
                 placeholder="Subject"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors mb-6"
               />
               <textarea
+                name="message"
+                value={form.message}
+                onChange={handleChange}
                 placeholder="Message"
                 required
                 rows="6"
