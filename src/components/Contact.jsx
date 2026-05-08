@@ -1,11 +1,38 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
+import emailjs from '@emailjs/browser'
+
+const INITIAL_FORM = { name: '', email: '', subject: '', message: '' }
 
 const Contact = () => {
-  const handleSubmit = (e) => {
+  const [form, setForm] = useState(INITIAL_FORM)
+  const [status, setStatus] = useState('idle') // idle | loading | success | error
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle form submission
-    alert('Form submitted! (Connect to your backend)')
+    setStatus('loading')
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          subject: form.subject,
+          message: form.message,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
+      setStatus('success')
+      setForm(INITIAL_FORM)
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -71,15 +98,31 @@ const Contact = () => {
             viewport={{ once: true }}
           >
             <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 shadow-md h-full">
+              {status === 'success' && (
+                <div className="mb-6 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+                  Message sent successfully! I'll get back to you soon.
+                </div>
+              )}
+              {status === 'error' && (
+                <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                  Something went wrong. Please try again or email me directly.
+                </div>
+              )}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Your Name"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Your Email"
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors"
@@ -87,11 +130,17 @@ const Contact = () => {
               </div>
               <input
                 type="text"
+                name="subject"
+                value={form.subject}
+                onChange={handleChange}
                 placeholder="Subject"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors mb-6"
               />
               <textarea
+                name="message"
+                value={form.message}
+                onChange={handleChange}
                 placeholder="Message"
                 required
                 rows="6"
@@ -99,9 +148,10 @@ const Contact = () => {
               ></textarea>
               <button
                 type="submit"
-                className="w-full md:w-auto px-10 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/85 transition-all hover:-translate-y-0.5"
+                disabled={status === 'loading'}
+                className="w-full md:w-auto px-10 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/85 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
-                Send Message
+                {status === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </motion.div>
