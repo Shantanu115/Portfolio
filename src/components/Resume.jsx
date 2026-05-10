@@ -49,12 +49,7 @@ const Resume = () => {
       period: '2026',
       role: 'Presenter',
       title: 'International Conference on Mathematical Sciences & Computer Intelligence',
-      description: 'Presented paper on Efficient Facial Expression Recognition via Dynamic Heterogeneous Ensemble',
-      points: [
-        'Presented a two-stage cascade over 5 architectures (ViT, CoAtNet, Swin, EfficientNetV2, gMLP)',
-        'Achieved 66.29% Macro F1 on AffectNet with 30.6% compute reduction vs. full static ensemble',
-        'Demonstrated 90.68% zero-shot accuracy on CK+ dataset'
-      ]
+      description: 'Presented paper on Efficient Facial Expression Recognition via Dynamic Heterogeneous Ensemble'
     }
   ]
 
