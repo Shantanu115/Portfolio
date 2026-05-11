@@ -49,7 +49,7 @@ const Resume = () => {
       period: '2026',
       role: 'Presenter',
       title: 'International Conference on Mathematical Sciences & Computer Intelligence',
-      description: 'Presented paper on Efficient Facial Expression Recognition via Dynamic Heterogeneous Ensemble'
+      description: 'Presented paper "A Heterogeneous Ensemble Approach for Improving Robustness in Facial Expression Recognition Across Variable Conditions"
     }
   ]
 
